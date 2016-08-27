@@ -1,0 +1,82 @@
+
+
+Solo un axis puede estar activo al mismo tiempo en un actuador
+
+
+actuator.c
+
+Se encarga de activar y desactivar (físicamente) tensores
+
+actuator_set_tensor_quantum(tensor_id, quantum)
+
+actuator_tensor_enable(tensor_id)
+
+actuator_tensor_disable(tensor_id)
+
+actuator_tensor_get_index(tensor or set of rules)
+
+NUM_ACTUATORS    32
+
+
+actuator_data[NUM_ACTUATORS]:
+    - axis_0_enabled
+    - axis_0_inverted
+    - axis_1_enabled
+    - axis_1_inverted
+    - translated_index
+
+
+tensor_data[NUM_ACTUATORS * 4]:
+    - quantum
+    - duration
+
+
+
+
+
+Mantiene una lista estática con todos los axis, y sus datos (tiempo pendiente de ejecución y última ejecución de un quantum)
+
+Tiene las herramientas necesarias para especificar axis como índices, o dados los datos Lado (Izq/Der), Extremidad (0, 1, 2...), Porción (0, 1, 2...), Eje (X/Y), Signo (positivo/negativo)
+
+Cada axis tiene una configuración en una tabla, que puede ser reconfigurada. Contiene cosas como: "quantum" por defecto, enabled, inverted, etc
+
+Función para comprobar si un actuador está activo (si alguno de sus tensores está activo)
+
+Configura el pulso PWM y la dirección de control para un Tensor, dentro de un actuador
+
+Contiene herramientas extra, como para detener un tensor activo, revertir la dirección de un actuador, etc
+
+
+sensor.c
+
+En cada pata pueden ir sensores, en principio para tacto al tocar el suelo o sensores de temperatura para los actuadores.
+
+Los sensores añaden información a los actuadores, de forma que el programa pueda reaccionar
+
+
+scheduler.c
+
+Se encarga de ejecutar quantums de los tensores activos
+
+Contiene una cola circular de índices a tensores activos, ordenados por el tiempo de su última ejecución de un quantum
+
+Mantiene la posición activa de la cola circular
+
+Cuando se activa un tensor, se encarga de saber si ya está activo o no, y añadirlo y/o (re)ordenarlo en la cola circular
+
+Al ejecutar un quantum, se encarga de comprobar que el mismo tensor no se haya ejecutado en un tiempo prudencial, para evitar sobrecalentarlo
+
+Se encargará también de leer los sensores en cada pata, de forma que el programa pueda reaccionar a ellos
+
+scheduler_set_tensor_duration(tensor, duration)
+
+
+program.c
+
+Función para ejecutar un paso en el programa del robot. Se entiende por paso, un conjunto de movimientos de tensores, sin repetir tensor
+
+Este módulo también posee las herramientas de control para empezar o terminar un programa.
+
+Herramientas para actualizar la configuración del robot, instalar programas, recibir comandos, etc
+
+

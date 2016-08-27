@@ -1,0 +1,6 @@
+#!/bin/bash
+
+make COMPILE=gcc BOOT=new APP=0 SPI_SPEED=40 SPI_MODE=QIO SPI_SIZE_MAP=6
+
+"/home/drone/.platformio/packages/tool-esptool/esptool" -vv -cd nodemcu -cb 230400 -cp "/dev/ttyUSB0" -ca 0x00000 -cf /opt/Espressif/bin/boot_v1.5.bin -ca 4096 -cf /opt/Espressif/bin/upgrade/user2.4096.new.6.bin -ca 1040384 -cf /opt/Espressif/bin/blank.bin -ca 1052672 -cf /opt/Espressif/bin/upgrade/user2.4096.new.6.bin -ca 4177920 -cf /opt/Espressif/bin/esp_init_data_default.bin -ca 4186112 -cf /opt/Espressif/bin/blank.bin
+
