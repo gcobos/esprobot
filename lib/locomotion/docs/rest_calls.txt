@@ -1,0 +1,55 @@
+
+GET /config
+
+Returns a JSON structure with current config
+   config {
+ 	 "actuators": {
+		"0": {
+			"address": 0, 
+			"axis": [
+				{
+					"quantum": 10000,
+					"duties": [13000, 24000]
+				}, 
+				{
+					"quantum": 8000,
+					"duties": [18000, 7000]
+				},
+			]
+		}
+	} 
+
+
+POST /config
+
+Configure actuators' addresses, quantum and duties for every axis 
+   config {
+ 	 "actuators": {
+		"0": {
+			"address": 0, 
+			"axis": [
+				{
+					"quantum": 10000,
+					"duties": [13000, 24000]
+				}, 
+				{
+					"quantum": 8000,
+					"duties": [18000, 7000]
+				},
+			]
+		}
+	} 
+
+
+GET /motion
+
+Returns current durations for every actuator
+
+
+POST /motion
+
+Expects a set of durations required for every actuator
+    motion {"actuators":{"0": [64, 80], "1": [64, 80], "2": [64, 70], "3": [64, 60], "4": [64, 60], "5": [64, 60], "6": [64, 70], "7": [64, 70]} }
+
+
+

@@ -9,5 +9,4 @@
 #define NBITS32(n) ((n&0xFFFF0000)?(16+NBITS16(n>>16)):(NBITS16(n)))
 #define NBITS(n) (n==0?0:NBITS32(n)+1)
 
-
 #endif
