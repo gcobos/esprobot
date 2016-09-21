@@ -45,8 +45,9 @@ extern "C" {
 #define ACT_CONTROL_ADDRESS_C 12		// GPIO12
 
 typedef struct {
-    int  quantum;	// Default quantum for this axis
-	  int  duty[2];	// PWM duty (index negative=0, positive=1) for this axis
+    uint16_t quantum;	// Default quantum for this axis
+	uint16_t duty[2];	// PWM duty (index negative=0, positive=1) for this axis
+	uint32_t inactivity_period;	// Minimum time to wait until the axis can be used again
 } t_axis_config;
 
 typedef struct  {
@@ -72,6 +73,8 @@ bool ICACHE_FLASH_ATTR actuators_configure_address(uint16_t actuator_id, uint16_
 bool ICACHE_FLASH_ATTR actuators_configure_axis_duty(uint16_t axis_id, uint16_t duty_negative, uint16_t duty_positive);
 
 bool ICACHE_FLASH_ATTR actuators_configure_axis_quantum(uint16_t axis_id, uint16_t quantum);
+
+bool ICACHE_FLASH_ATTR actuators_configure_axis_inactivity_period(uint16_t axis_id, uint32_t inactivity_period);
 
 bool ICACHE_FLASH_ATTR actuators_activate_address(uint16_t address);
 

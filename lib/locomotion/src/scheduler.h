@@ -3,9 +3,6 @@
 
 #include "actuators.h"
 
-// Interval in us since the last activation of an axis to be safe to be reactivated (recommended 1000000)
-#define SAFE_AXIS_INACTIVITY_PERIOD  1000000
-
 // Interval in ms to wait in case there is nothing to do with any of the axis so far (recommended 200)
 #define IDLE_SCHEDULER_CHECK_PERIOD  100
 

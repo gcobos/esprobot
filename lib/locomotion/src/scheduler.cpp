@@ -35,16 +35,18 @@ void ICACHE_FLASH_ATTR scheduler_init(void)
 void ICACHE_FLASH_ATTR scheduler_loop(void *arg)
 {
 		uint16_t axis_id = current_axis;
-		uint32 now = micros();
+		uint32_t now = micros();
 		t_axis_activity *activity;
-		uint32 active = 0;
+		t_actuator_config *actuator_config;
+		uint32_t active = 0;
 
 		//os_printf("%u: Check queue starting from: %d\n", now, axis_id);
 		do {
 				axis_id = (axis_id + 1) % (NUM_ACTUATORS * NUM_AXIS_PER_ACTUATOR);
 				activity = &axis_data[axis_id];
+				actuator_config = actuators_get_config(axis_id);
 				// If active and last executed is far enough, active axis and break the loop
-				if (activity->vector != 0 && now - activity->last_execution > SAFE_AXIS_INACTIVITY_PERIOD) {
+				if (activity->vector != 0 && now - activity->last_execution > actuator_config->axis[axis_id & ACTUATOR_BASE].inactivity_period) {
 						//os_printf("Cuanto es vector?\n", activity->vector);
 						activity->vector = (activity->vector > 0)?activity->vector-1 : activity->vector+1;
 						current_axis = axis_id;

@@ -42,6 +42,10 @@ void handleConfig(void)
                 (actuator_id<<ACTUATOR_BASE)+axis_index,
                 (int)axis[0]["duties"][0], (int)axis[0]["duties"][1]
             );
+            actuators_configure_axis_inactivity_period(
+                (actuator_id<<ACTUATOR_BASE)+axis_index,
+                (int)axis[0]["inactivity_period"]
+            );
         }
         actuators_configure_address(actuator_id, it->value["address"]);
     }
@@ -71,7 +75,7 @@ void handleMotion(void)
 
 void ICACHE_FLASH_ATTR handleRoot(void)
 {
-    webserver.send(200, "text/plain", "hello from esp8266!");
+    webserver.send(200, "text/plain", "ESP Robot API");
 }
 
 // Initialize webserver and attach handlers
@@ -83,19 +87,8 @@ void ICACHE_FLASH_ATTR webservice_init(IPAddress ip)
 
     // Declare handlers for every path
     webserver.on("/", handleRoot);
-
     webserver.on("/config", handleConfig);
-
     webserver.on("/motion", handleMotion);
-
-  	webserver.on("/inline", []() {
-        for (int i = 0; i < 16; i+=2) {
-            scheduler_move_axis(i, 10);
-        }
-        Serial.println("Acabo de mover los ejes");
-    	webserver.send(200, "text/plain", "this works as well");
-  	});
-
   	webserver.onNotFound(handleNotFound);
 
     // Initiate HTTP server
