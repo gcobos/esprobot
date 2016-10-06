@@ -81,7 +81,6 @@ t_actuator_config* ICACHE_FLASH_ATTR actuators_get_config(uint16_t axis_id)
 	return &actuators_config[axis_id>>ACTUATOR_BASE];
 }
 
-
 uint16_t ICACHE_FLASH_ATTR actuators_get_address(uint16_t actuator_id)
 {
 	return actuators_config[actuator_id].address;

@@ -44,6 +44,7 @@ Configure actuators' addresses, quantum and duties for every axis
 GET /motion
 
 Returns current durations for every actuator
+{"actuators":{"0": [64, 80], "1": [64, 80], "2": [64, 70], "3": [64, 60], "4": [64, 60], "5": [64, 60], "6": [64, 70], "7": [64, 70]} }
 
 
 POST /motion

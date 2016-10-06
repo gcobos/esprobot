@@ -84,7 +84,7 @@ void ICACHE_FLASH_ATTR scheduler_save_context()
 		// TODO
 }
 
-bool ICACHE_FLASH_ATTR scheduler_move_axis(uint16_t axis_id, sint16 vector)
+bool ICACHE_FLASH_ATTR scheduler_move_axis(uint16_t axis_id, sint16_t vector)
 {
 	// vector = 0, turns off the actuator
 	if (axis_id < 0 || axis_id > (NUM_ACTUATORS * NUM_AXIS_PER_ACTUATOR)-1) {
@@ -94,6 +94,12 @@ bool ICACHE_FLASH_ATTR scheduler_move_axis(uint16_t axis_id, sint16 vector)
 	axis_data[axis_id].vector += vector;			// Movement is accumulative now
 
 	return true;
+}
+
+sint16_t ICACHE_FLASH_ATTR scheduler_get_axis_vector(uint16_t axis_id)
+{
+	// Returns current vector of activity for an axis
+	return axis_data[axis_id].vector;
 }
 
 uint16_t ICACHE_FLASH_ATTR scheduler_execute_axis_quantum(uint16_t axis_id, sint16 vector)

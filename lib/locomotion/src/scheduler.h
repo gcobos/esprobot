@@ -27,6 +27,8 @@ void ICACHE_FLASH_ATTR scheduler_loop(void *arg);
 
 bool ICACHE_FLASH_ATTR scheduler_move_axis(uint16_t axis_id, sint16_t vector);
 
+sint16_t ICACHE_FLASH_ATTR scheduler_get_axis_vector(uint16_t axis_id);
+
 uint16_t ICACHE_FLASH_ATTR scheduler_execute_axis_quantum(uint16_t axis_id, sint16_t vector);
 
 #endif

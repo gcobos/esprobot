@@ -36,23 +36,45 @@ void handleConfig(void)
         for (int axis_index = 0; axis_index < NUM_AXIS_PER_ACTUATOR; axis_index++) {
             actuators_configure_axis_quantum(
                 (actuator_id<<ACTUATOR_BASE)+axis_index,
-                (int)axis[0]["quantum"]
+                (int)axis[axis_index]["quantum"]
             );
             actuators_configure_axis_duty(
                 (actuator_id<<ACTUATOR_BASE)+axis_index,
-                (int)axis[0]["duties"][0], (int)axis[0]["duties"][1]
+                (int)axis[axis_index]["duties"][0], (int)axis[axis_index]["duties"][1]
             );
             actuators_configure_axis_inactivity_period(
                 (actuator_id<<ACTUATOR_BASE)+axis_index,
-                (int)axis[0]["inactivity_period"]
+                (int)axis[axis_index]["inactivity_period"]
             );
+            Serial.print("Inactivity period now: ");
+            Serial.print((int)axis[axis_index]["inactivity_period"]);
         }
-        actuators_configure_address(actuator_id, it->value["address"]);
+        actuators_configure_address(actuator_id, (int)it->value["address"]);
     }
-    webserver.send( 200, "text/json", "{result:true}");
+    webserver.send( 200, "text/json", "{\"result\":true}");
 }
 
-void handleMotion(void)
+void handleGetMotion(void)
+{
+    StaticJsonBuffer<2000> plain_json;
+    String output = "";
+
+    JsonObject& root = plain_json.createObject();
+    JsonObject& actuators = root.createNestedObject("actuators");
+
+    for (int16_t actuator_id = 0; actuator_id < NUM_ACTUATORS; actuator_id++) {
+        JsonArray& durations = actuators.createNestedArray(String(actuator_id));
+
+        for (int axis_index = 0; axis_index < NUM_AXIS_PER_ACTUATOR; axis_index++) {
+            durations.add(scheduler_get_axis_vector((actuator_id << ACTUATOR_BASE)+axis_index));
+        }
+    }
+    root.printTo(output);
+    webserver.send(200, "text/json", output);
+}
+
+
+void handlePostMotion(void)
 {
     StaticJsonBuffer<2000> plain_json;
 
@@ -63,14 +85,14 @@ void handleMotion(void)
     JsonObject& actuators = root["actuators"];
 
     for(JsonObject::iterator it=actuators.begin(); it!=actuators.end(); ++it) {
-        int actuator_id = it->key[0] - '0';
+        int actuator_id = String(it->key[0]).toInt();
         JsonArray& axis = it->value;
 
         for (int axis_index = 0; axis_index < NUM_AXIS_PER_ACTUATOR; axis_index++) {
             scheduler_move_axis((actuator_id << ACTUATOR_BASE)+axis_index, (int)it->value[axis_index]);
         }
     }
-    webserver.send( 200, "text/json", "{result:true}");
+    webserver.send( 200, "text/json", "{\"result\":true}");
 }
 
 void ICACHE_FLASH_ATTR handleRoot(void)
@@ -88,7 +110,8 @@ void ICACHE_FLASH_ATTR webservice_init(IPAddress ip)
     // Declare handlers for every path
     webserver.on("/", handleRoot);
     webserver.on("/config", handleConfig);
-    webserver.on("/motion", handleMotion);
+    webserver.on("/motion", HTTP_GET, handleGetMotion);
+    webserver.on("/motion", HTTP_POST, handlePostMotion);
   	webserver.onNotFound(handleNotFound);
 
     // Initiate HTTP server
