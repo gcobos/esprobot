@@ -46,13 +46,12 @@ void ICACHE_FLASH_ATTR scheduler_loop(void *arg)
 				activity = &axis_data[axis_id];
 				actuator_config = actuators_get_config(axis_id);
 				// If active and last executed is far enough, active axis and break the loop
-				if (activity->vector != 0 && now - activity->last_execution > actuator_config->axis[axis_id & ACTUATOR_BASE].inactivity_period) {
-						//os_printf("Cuanto es vector?\n", activity->vector);
-						activity->vector = (activity->vector > 0)?activity->vector-1 : activity->vector+1;
+				if (activity->vector != 0 && now - activity->last_execution > actuator_config->axis[axis_id & ACTUATOR_BASE].inactivity_period * 1000) {
 						current_axis = axis_id;
 
 						// Set the axis on
 						active = scheduler_execute_axis_quantum(axis_id, activity->vector);
+						activity->vector = (activity->vector > 0)?activity->vector-1 : activity->vector+1;
 						if (active) {
 								Serial.print(now);
 								Serial.print(" Activate axis_id ");
@@ -60,7 +59,7 @@ void ICACHE_FLASH_ATTR scheduler_loop(void *arg)
 								Serial.print(" for ");
 								Serial.println(active);
 						}
-						activity->last_execution = now + (active*1000);
+						activity->last_execution = now + (active * 1000);
 						break;
 				}
 		} while (axis_id != current_axis);
@@ -90,7 +89,7 @@ bool ICACHE_FLASH_ATTR scheduler_move_axis(uint16_t axis_id, sint16_t vector)
 	if (axis_id < 0 || axis_id > (NUM_ACTUATORS * NUM_AXIS_PER_ACTUATOR)-1) {
 		return false;
 	}
-	Serial.println(" MOVE axis!!! ");
+
 	axis_data[axis_id].vector += vector;			// Movement is accumulative now
 
 	return true;
@@ -121,8 +120,7 @@ uint16_t ICACHE_FLASH_ATTR scheduler_execute_axis_quantum(uint16_t axis_id, sint
 				}
 	  }
 
-		if (vector && axis_config->quantum) {
-
+	  if (vector && axis_config->quantum) {
 				actuators_activate_address(actuator_config->address);
 
 				//os_printf("Get address of the actuator given its axis %d = %d\n", axis_id>>1, actuator_config->address);

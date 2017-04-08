@@ -15,10 +15,12 @@ extern "C" {
 
 #define NUM_ACTUATORS    8
 
-#define DEFAULT_QUANTUM  500	   // Default quantum in ms
+#define DEFAULT_QUANTUM  250	   // Default quantum in ms
 
 #define ACT_PWM_PERIOD	  901
 #define ACT_PWM_NUM_CHANNELS	1
+
+#define DEFAULT_INACTIVITY_PERIOD	1000		// Minimum number of ms for a tensor to wait before it can be used again
 
 // Axis definition for the actuators
 #define NUM_AXIS_PER_ACTUATOR	2
@@ -47,7 +49,7 @@ extern "C" {
 typedef struct {
     uint16_t quantum;	// Default quantum for this axis
 	uint16_t duty[2];	// PWM duty (index negative=0, positive=1) for this axis
-	uint32_t inactivity_period;	// Minimum time to wait until the axis can be used again
+	uint16_t inactivity_period;	// Minimum time to wait until the axis can be used again
 } t_axis_config;
 
 typedef struct  {
@@ -74,7 +76,7 @@ bool ICACHE_FLASH_ATTR actuators_configure_axis_duty(uint16_t axis_id, uint16_t 
 
 bool ICACHE_FLASH_ATTR actuators_configure_axis_quantum(uint16_t axis_id, uint16_t quantum);
 
-bool ICACHE_FLASH_ATTR actuators_configure_axis_inactivity_period(uint16_t axis_id, uint32_t inactivity_period);
+bool ICACHE_FLASH_ATTR actuators_configure_axis_inactivity_period(uint16_t axis_id, uint16_t inactivity_period);
 
 bool ICACHE_FLASH_ATTR actuators_activate_address(uint16_t address);
 

@@ -34,12 +34,12 @@ void ICACHE_FLASH_ATTR actuators_init(void) {
 		actuators_config[i].axis[X_AXIS].quantum = DEFAULT_QUANTUM;
 		actuators_config[i].axis[X_AXIS].duty[NEGATIVE] = 240;
 		actuators_config[i].axis[X_AXIS].duty[POSITIVE] = 720;
-		actuators_config[i].axis[X_AXIS].inactivity_period = 1000000;
+		actuators_config[i].axis[X_AXIS].inactivity_period = DEFAULT_INACTIVITY_PERIOD;
 
 		actuators_config[i].axis[Y_AXIS].quantum = DEFAULT_QUANTUM;
 		actuators_config[i].axis[Y_AXIS].duty[NEGATIVE] = 480;
 		actuators_config[i].axis[Y_AXIS].duty[POSITIVE] = 1023;
-		actuators_config[i].axis[Y_AXIS].inactivity_period = 1000000;
+		actuators_config[i].axis[Y_AXIS].inactivity_period = DEFAULT_INACTIVITY_PERIOD;
 	}
 
 	// Disable PWM output
@@ -107,7 +107,7 @@ bool ICACHE_FLASH_ATTR actuators_configure_axis_quantum(uint16_t axis_id, uint16
 	return true;
 }
 
-bool ICACHE_FLASH_ATTR actuators_configure_axis_inactivity_period(uint16_t axis_id, uint32_t inactivity_period)
+bool ICACHE_FLASH_ATTR actuators_configure_axis_inactivity_period(uint16_t axis_id, uint16_t inactivity_period)
 {
 	actuators_config[axis_id >> ACTUATOR_BASE].axis[axis_id & ACTUATOR_BASE].inactivity_period = inactivity_period;
 	return true;

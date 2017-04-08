@@ -46,10 +46,12 @@ void handleConfig(void)
                 (actuator_id<<ACTUATOR_BASE)+axis_index,
                 (int)axis[axis_index]["inactivity_period"]
             );
-            Serial.print("Inactivity period now: ");
-            Serial.print((int)axis[axis_index]["inactivity_period"]);
         }
+        Serial.print("Address before: ");
+        Serial.println((int)actuators_get_address(actuator_id));
         actuators_configure_address(actuator_id, (int)it->value["address"]);
+        Serial.print("Address now: ");
+        Serial.println((int)actuators_get_address(actuator_id));
     }
     webserver.send( 200, "text/json", "{\"result\":true}");
 }
@@ -103,7 +105,7 @@ void ICACHE_FLASH_ATTR handleRoot(void)
 // Initialize webserver and attach handlers
 void ICACHE_FLASH_ATTR webservice_init(IPAddress ip)
 {
-    if (mdns.begin("esp8266", ip)) {
+    if (mdns.begin("esprobot", ip)) {
         Serial.println("MDNS responder started");
     }
 
