@@ -19,7 +19,38 @@ void handleNotFound()
     webserver.send(404, "text/plain", message);
 }
 
-void handleConfig(void)
+void handleGetConfig(void)
+{
+    StaticJsonBuffer<2200> plain_json;
+    t_actuator_config *actuator_config;
+    String output = "";
+
+    JsonObject& root = plain_json.createObject();
+    JsonObject& actuators = root.createNestedObject("actuators");
+
+    for (int16_t actuator_id = 0; actuator_id < NUM_ACTUATORS; actuator_id++) {
+        JsonObject& actuator = actuators.createNestedObject(String(actuator_id));
+
+        JsonArray& axis_config_list = actuator.createNestedArray("axis");
+        for (int axis_index = 0; axis_index < NUM_AXIS_PER_ACTUATOR; axis_index++) {
+            actuator_config = actuators_get_config(axis_index);
+            JsonObject& axis_config = axis_config_list.createNestedObject();
+            axis_config["quantum"] = actuator_config->axis[axis_index & ACTUATOR_BASE].quantum;
+            JsonArray& duties = axis_config.createNestedArray("duties");
+            duties.add(actuator_config->axis[axis_index & ACTUATOR_BASE].duty[NEGATIVE]);
+            duties.add(actuator_config->axis[axis_index & ACTUATOR_BASE].duty[POSITIVE]);
+            axis_config["inactivity_period"] = actuator_config->axis[axis_index & ACTUATOR_BASE].inactivity_period;
+        }
+
+        // Add address for this axis
+        actuator["address"] = actuators_get_address(actuator_id);
+    }
+    root.printTo(output);
+    webserver.send(200, "text/json", output);
+}
+
+
+void handlePostConfig(void)
 {
     StaticJsonBuffer<2000> plain_json;
 
@@ -47,11 +78,11 @@ void handleConfig(void)
                 (int)axis[axis_index]["inactivity_period"]
             );
         }
-        Serial.print("Address before: ");
-        Serial.println((int)actuators_get_address(actuator_id));
+        //Serial.print("Address before: ");
+        //Serial.println((int)actuators_get_address(actuator_id));
         actuators_configure_address(actuator_id, (int)it->value["address"]);
-        Serial.print("Address now: ");
-        Serial.println((int)actuators_get_address(actuator_id));
+        //Serial.print("Address now: ");
+        //Serial.println((int)actuators_get_address(actuator_id));
     }
     webserver.send( 200, "text/json", "{\"result\":true}");
 }
@@ -111,7 +142,8 @@ void ICACHE_FLASH_ATTR webservice_init(IPAddress ip)
 
     // Declare handlers for every path
     webserver.on("/", handleRoot);
-    webserver.on("/config", handleConfig);
+    webserver.on("/config", HTTP_GET, handleGetConfig);
+    webserver.on("/config", HTTP_POST, handlePostConfig);
     webserver.on("/motion", HTTP_GET, handleGetMotion);
     webserver.on("/motion", HTTP_POST, handlePostMotion);
   	webserver.onNotFound(handleNotFound);
